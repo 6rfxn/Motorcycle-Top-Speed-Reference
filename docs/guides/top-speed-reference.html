@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EXRGarage — Top Speed Reference</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏍️</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f13;
+    --surface: #151820;
+    --surface2: #1c2030;
+    --border: #2a2f40;
+    --text: #e2e4ea;
+    --text-dim: #6b7394;
+    --accent: #3b82f6;
+    --accent-glow: rgba(59, 130, 246, 0.15);
+    --green: #34d399;
+    --orange: #f59e0b;
+    --red: #ef4444;
+    --purple: #a78bfa;
+    --font-mono: 'JetBrains Mono', monospace;
+    --font-sans: 'Space Grotesk', sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-sans); min-height: 100vh; }
+  body::before { content:''; position:fixed; inset:0; background-image: linear-gradient(rgba(59,130,246,0.03) 1px,transparent 1px), linear-gradient(90deg,rgba(59,130,246,0.03) 1px,transparent 1px); background-size:40px 40px; pointer-events:none; }
+
+  .container { position:relative; z-index:1; max-width:1100px; margin:0 auto; padding:40px 24px; }
+
+  .back-link { display:inline-flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:12px; color:var(--text-dim); text-decoration:none; margin-bottom:24px; transition:color 0.2s; }
+  .back-link:hover { color:var(--accent); }
+
+  .header { text-align:center; margin-bottom:48px; }
+  .badge { display:inline-block; font-family:var(--font-mono); font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--green); background:rgba(52,211,153,0.1); border:1px solid rgba(52,211,153,0.25); padding:6px 16px; border-radius:20px; margin-bottom:16px; }
+  .header h1 { font-size:28px; font-weight:700; letter-spacing:-0.5px; margin-bottom:8px; }
+  .header p { color:var(--text-dim); font-size:14px; }
+
+  /* Tab switcher */
+  .tabs { display:flex; gap:8px; margin-bottom:24px; flex-wrap:wrap; }
+  .tab { font-family:var(--font-mono); font-size:12px; padding:8px 16px; border-radius:8px; border:1px solid var(--border); background:var(--surface); color:var(--text-dim); cursor:pointer; transition:all 0.2s; letter-spacing:0.5px; }
+  .tab:hover { border-color:var(--accent); color:var(--text); }
+  .tab.active { background:var(--accent); border-color:var(--accent); color:white; }
+
+  /* Card */
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:24px; margin-bottom:24px; }
+  .card-title { font-family:var(--font-mono); font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-dim); margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid var(--border); }
+
+  /* Tables */
+  .table-wrap { overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th { font-family:var(--font-mono); font-size:11px; letter-spacing:0.5px; text-transform:uppercase; color:var(--text-dim); text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); font-weight:500; white-space:nowrap; }
+  td { padding:10px 12px; border-bottom:1px solid rgba(42,47,64,0.5); font-family:var(--font-mono); font-size:13px; white-space:nowrap; }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:rgba(59,130,246,0.03); }
+
+  .val-speed { color:var(--green); font-weight:600; }
+  .val-power { color:var(--orange); font-weight:600; }
+  .val-accel { color:var(--accent); font-weight:600; }
+  .val-weight { color:var(--purple); }
+  .val-dim { color:var(--text-dim); }
+
+  .type-badge { font-size:10px; padding:2px 8px; border-radius:4px; font-weight:600; }
+  .type-badge.t4 { color:var(--accent); background:rgba(59,130,246,0.1); }
+  .type-badge.t2 { color:var(--green); background:rgba(52,211,153,0.1); }
+
+  /* Bar chart */
+  .bar-container { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+  .bar-label { font-family:var(--font-mono); font-size:12px; color:var(--text-dim); width:120px; text-align:right; flex-shrink:0; }
+  .bar-track { flex:1; height:24px; background:var(--surface2); border-radius:6px; overflow:hidden; position:relative; }
+  .bar-fill { height:100%; border-radius:6px; transition:width 0.5s cubic-bezier(0.34,1.56,0.64,1); display:flex; align-items:center; padding-left:10px; }
+  .bar-value { font-family:var(--font-mono); font-size:11px; color:white; font-weight:600; white-space:nowrap; }
+
+  .section-gap { height:32px; }
+
+  /* Hidden sections */
+  .cc-section { display:none; }
+  .cc-section.active { display:block; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <a href="../index.html" class="back-link">← Back to Tools</a>
+
+  <div class="header">
+    <div class="badge">Reference</div>
+    <h1>🏁 Top Speed Reference</h1>
+    <p>Real-world motorcycle data for 250cc, 600cc, and 1000cc — use as a baseline for your Tune script values.</p>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="showCC('250')">250cc</div>
+    <div class="tab" onclick="showCC('600')">600cc</div>
+    <div class="tab" onclick="showCC('1000')">1000cc</div>
+    <div class="tab" onclick="showCC('compare')">Compare All</div>
+  </div>
+
+  <!-- 250CC -->
+  <div class="cc-section active" id="sec-250">
+    <div class="card">
+      <div class="card-title">250cc — Speed Ranking (km/h)</div>
+      <div id="bars-250"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">250cc — Full Comparison</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Engine</th>
+              <th>Top Speed</th>
+              <th>Power</th>
+              <th>Torque</th>
+              <th>0–100</th>
+              <th>Weight</th>
+              <th>HP/kg</th>
+            </tr>
+          </thead>
+          <tbody id="table-250"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 600CC -->
+  <div class="cc-section" id="sec-600">
+    <div class="card">
+      <div class="card-title">600cc — Speed Ranking (km/h)</div>
+      <div id="bars-600"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">600cc — Full Comparison</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Engine</th>
+              <th>Top Speed</th>
+              <th>Power</th>
+              <th>Torque</th>
+              <th>0–100</th>
+              <th>Weight</th>
+              <th>HP/kg</th>
+            </tr>
+          </thead>
+          <tbody id="table-600"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1000CC -->
+  <div class="cc-section" id="sec-1000">
+    <div class="card">
+      <div class="card-title">1000cc — Speed Ranking (km/h)</div>
+      <div id="bars-1000"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">1000cc — Full Comparison</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Engine</th>
+              <th>Top Speed</th>
+              <th>Power</th>
+              <th>Torque</th>
+              <th>0–100</th>
+              <th>Weight</th>
+              <th>HP/kg</th>
+            </tr>
+          </thead>
+          <tbody id="table-1000"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Compare All -->
+  <div class="cc-section" id="sec-compare">
+    <div class="card">
+      <div class="card-title">Top Speed Comparison — All Displacements</div>
+      <div id="bars-compare"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">2-Stroke vs 4-Stroke — Speed Advantage</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Displacement</th><th>Category</th><th>4T Speed</th><th>2T Speed</th><th>Difference</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>250cc</td><td>Racing</td><td class="val-dim">180–200</td><td class="val-speed">195–220</td><td class="val-speed">+10–20 km/h</td></tr>
+            <tr><td>250cc</td><td>Drag</td><td class="val-dim">190–220</td><td class="val-speed">220–250</td><td class="val-speed">+10–30 km/h</td></tr>
+            <tr><td>600cc</td><td>Racing</td><td class="val-dim">250–270</td><td class="val-speed">280–310</td><td class="val-speed">+20–40 km/h</td></tr>
+            <tr><td>600cc</td><td>Drag</td><td class="val-dim">260–290</td><td class="val-speed">310–350+</td><td class="val-speed">+30–60 km/h</td></tr>
+            <tr><td>1000cc</td><td>Racing</td><td class="val-dim">300–330</td><td class="val-speed">320–360</td><td class="val-speed">+10–30 km/h</td></tr>
+            <tr><td>1000cc</td><td>Drag</td><td class="val-dim">310–350+</td><td class="val-speed">350+</td><td class="val-speed">+20–40 km/h</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const data = {
+  '250': [
+    { type:'Drag',      eng:'2T', speed:[220,250], hp:[70,90],  tq:[40,55],  accel:[3.8,4.8], weight:[85,110],  hpkg:[2.1,2.8] },
+    { type:'Racing',    eng:'2T', speed:[195,220], hp:[55,75],  tq:[32,42],  accel:[5.2,6.5], weight:[110,130], hpkg:[1.8,2.2] },
+    { type:'Drag',      eng:'4T', speed:[190,220], hp:[65,85],  tq:[35,50],  accel:[4.2,5.5], weight:[90,120],  hpkg:[1.8,2.4] },
+    { type:'Endurance', eng:'2T', speed:[185,210], hp:[50,68],  tq:[35,45],  accel:[5.0,6.2], weight:[105,125], hpkg:[1.7,2.1] },
+    { type:'Racing',    eng:'4T', speed:[180,200], hp:[45,60],  tq:[28,38],  accel:[5.8,7.2], weight:[130,150], hpkg:[1.3,1.7] },
+    { type:'Street',    eng:'2T', speed:[175,195], hp:[40,55],  tq:[28,35],  accel:[5.8,7.2], weight:[110,130], hpkg:[1.4,1.8] },
+    { type:'Endurance', eng:'4T', speed:[170,190], hp:[50,62],  tq:[30,40],  accel:[5.5,6.8], weight:[125,145], hpkg:[1.35,1.75] },
+    { type:'Street',    eng:'4T', speed:[160,180], hp:[35,48],  tq:[24,32],  accel:[6.2,7.5], weight:[135,155], hpkg:[1.0,1.3] },
+    { type:'Stock',     eng:'4T', speed:[150,170], hp:[25,36],  tq:[22,28],  accel:[6.5,8.5], weight:[130,150], hpkg:[0.85,1.05] },
+  ],
+  '600': [
+    { type:'Drag',      eng:'2T', speed:[310,350], hp:[200,280], tq:[110,150], accel:[2.6,3.2], weight:[130,160], hpkg:[2.0,2.8] },
+    { type:'Racing',    eng:'2T', speed:[280,310], hp:[160,200], tq:[85,110],  accel:[3.0,3.6], weight:[160,185], hpkg:[1.8,2.1] },
+    { type:'Endurance', eng:'2T', speed:[270,300], hp:[150,185], tq:[80,105],  accel:[3.2,3.8], weight:[155,180], hpkg:[1.7,2.0] },
+    { type:'Drag',      eng:'4T', speed:[260,290], hp:[140,180], tq:[80,100],  accel:[3.1,3.8], weight:[130,160], hpkg:[1.7,2.3] },
+    { type:'Racing',    eng:'4T', speed:[250,270], hp:[125,145], tq:[72,82],   accel:[3.5,4.2], weight:[180,200], hpkg:[1.4,1.7] },
+    { type:'Endurance', eng:'4T', speed:[240,260], hp:[115,140], tq:[75,88],   accel:[3.6,4.2], weight:[175,195], hpkg:[1.3,1.6] },
+    { type:'Street',    eng:'4T', speed:[220,240], hp:[100,125], tq:[66,75],   accel:[3.8,4.5], weight:[190,215], hpkg:[1.1,1.4] },
+    { type:'Stock',     eng:'4T', speed:[200,220], hp:[90,110],  tq:[64,72],   accel:[4.0,4.8], weight:[180,200], hpkg:[0.80,0.95] },
+  ],
+  '1000': [
+    { type:'Drag',      eng:'2T', speed:[350,400], hp:[300,450], tq:[220,300], accel:[2.1,2.5], weight:[120,150], hpkg:[2.5,3.5] },
+    { type:'Racing',    eng:'2T', speed:[320,360], hp:[250,320], tq:[170,200], accel:[2.4,2.8], weight:[155,180], hpkg:[2.0,2.4] },
+    { type:'Drag',      eng:'4T', speed:[310,350], hp:[220,280], tq:[150,200], accel:[2.3,2.8], weight:[120,160], hpkg:[1.8,2.5] },
+    { type:'Racing',    eng:'4T', speed:[300,330], hp:[190,220], tq:[125,145], accel:[2.8,3.2], weight:[195,220], hpkg:[1.2,1.5] },
+    { type:'Endurance', eng:'4T', speed:[280,310], hp:[180,210], tq:[130,155], accel:[2.9,3.4], weight:[185,210], hpkg:[1.3,1.6] },
+    { type:'Street',    eng:'4T', speed:[250,280], hp:[160,190], tq:[110,125], accel:[3.0,3.5], weight:[205,240], hpkg:[1.0,1.3] },
+    { type:'Stock',     eng:'4T', speed:[230,260], hp:[140,160], tq:[105,115], accel:[3.2,3.8], weight:[195,220], hpkg:[0.75,0.95] },
+  ]
+};
+
+function range(arr) { return arr[0] + '–' + arr[1]; }
+function avg(arr) { return (arr[0] + arr[1]) / 2; }
+
+function getBarColor(eng) {
+  return eng === '2T' ? 'var(--green)' : 'var(--accent)';
+}
+
+function renderBars(containerId, items, maxVal) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  items.forEach(d => {
+    const pct = (avg(d.speed) / maxVal) * 100;
+    el.innerHTML += `
+      <div class="bar-container">
+        <div class="bar-label">${d.type} <span class="type-badge ${d.eng.toLowerCase()}">${d.eng}</span></div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:${pct}%;background:${getBarColor(d.eng)}">
+            <span class="bar-value">${range(d.speed)} km/h</span>
+          </div>
+        </div>
+      </div>`;
+  });
+}
+
+function renderTable(tbodyId, items) {
+  const el = document.getElementById(tbodyId);
+  el.innerHTML = '';
+  items.forEach(d => {
+    el.innerHTML += `<tr>
+      <td>${d.type} <span class="type-badge ${d.eng.toLowerCase()}">${d.eng}</span></td>
+      <td>${d.eng}</td>
+      <td class="val-speed">${range(d.speed)} km/h</td>
+      <td class="val-power">${range(d.hp)} HP</td>
+      <td>${range(d.tq)} Nm</td>
+      <td class="val-accel">${range(d.accel)}s</td>
+      <td class="val-weight">${range(d.weight)} kg</td>
+      <td>${range(d.hpkg)}</td>
+    </tr>`;
+  });
+}
+
+function showCC(cc) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.cc-section').forEach(s => s.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('sec-' + cc).classList.add('active');
+}
+
+// Render all
+renderBars('bars-250', data['250'], 260);
+renderTable('table-250', data['250']);
+
+renderBars('bars-600', data['600'], 360);
+renderTable('table-600', data['600']);
+
+renderBars('bars-1000', data['1000'], 420);
+renderTable('table-1000', data['1000']);
+
+// Compare bars
+const compareData = [
+  { type:'1000cc Drag', eng:'2T', speed:[350,400] },
+  { type:'1000cc Racing', eng:'2T', speed:[320,360] },
+  { type:'1000cc Drag', eng:'4T', speed:[310,350] },
+  { type:'1000cc Racing', eng:'4T', speed:[300,330] },
+  { type:'600cc Drag', eng:'2T', speed:[310,350] },
+  { type:'600cc Racing', eng:'2T', speed:[280,310] },
+  { type:'600cc Drag', eng:'4T', speed:[260,290] },
+  { type:'1000cc Stock', eng:'4T', speed:[230,260] },
+  { type:'250cc Drag', eng:'2T', speed:[220,250] },
+  { type:'600cc Stock', eng:'4T', speed:[200,220] },
+  { type:'250cc Stock', eng:'4T', speed:[150,170] },
+];
+renderBars('bars-compare', compareData, 420);
+</script>
+
+</body>
+</html>

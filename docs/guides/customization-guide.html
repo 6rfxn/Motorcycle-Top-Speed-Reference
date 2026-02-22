@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EXRGarage — Customization Guide</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏍️</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#0d0f13; --surface:#151820; --surface2:#1c2030; --border:#2a2f40; --text:#e2e4ea; --text-dim:#6b7394; --accent:#3b82f6; --accent-glow:rgba(59,130,246,0.15); --green:#34d399; --orange:#f59e0b; --purple:#a78bfa; --font-mono:'JetBrains Mono',monospace; --font-sans:'Space Grotesk',sans-serif; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:var(--font-sans); min-height:100vh; line-height:1.7; }
+  body::before { content:''; position:fixed; inset:0; background-image:linear-gradient(rgba(59,130,246,0.03)1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,0.03)1px,transparent 1px); background-size:40px 40px; pointer-events:none; }
+  .container { position:relative; z-index:1; max-width:780px; margin:0 auto; padding:40px 24px; }
+  .back-link { display:inline-flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:12px; color:var(--text-dim); text-decoration:none; margin-bottom:24px; transition:color 0.2s; }
+  .back-link:hover { color:var(--accent); }
+  .header { text-align:center; margin-bottom:48px; }
+  .badge { display:inline-block; font-family:var(--font-mono); font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--purple); background:rgba(167,139,250,0.1); border:1px solid rgba(167,139,250,0.25); padding:6px 16px; border-radius:20px; margin-bottom:16px; }
+  .header h1 { font-size:28px; font-weight:700; letter-spacing:-0.5px; margin-bottom:8px; }
+  .header p { color:var(--text-dim); font-size:14px; }
+
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:28px; margin-bottom:20px; }
+  .card h2 { font-size:18px; font-weight:700; margin-bottom:6px; }
+  .card h3 { font-size:15px; font-weight:600; margin-top:20px; margin-bottom:8px; color:var(--purple); }
+  .card p { color:var(--text-dim); font-size:14px; margin-bottom:12px; }
+  .card ul, .card ol { padding-left:20px; margin-bottom:12px; }
+  .card li { color:var(--text-dim); font-size:14px; margin-bottom:6px; }
+  .card li strong { color:var(--text); }
+
+  code { font-family:var(--font-mono); font-size:13px; background:var(--surface2); padding:2px 8px; border-radius:4px; color:var(--green); }
+  .code-block { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:16px; font-family:var(--font-mono); font-size:13px; line-height:1.7; overflow-x:auto; white-space:pre; color:var(--text-dim); margin:12px 0; }
+
+  .flow-diagram { display:flex; align-items:center; gap:12px; flex-wrap:wrap; justify-content:center; margin:20px 0; }
+  .flow-box { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:12px 18px; font-family:var(--font-mono); font-size:12px; text-align:center; }
+  .flow-box.highlight { border-color:var(--purple); color:var(--purple); }
+  .flow-arrow { color:var(--text-dim); font-size:18px; }
+
+  table { width:100%; border-collapse:collapse; margin:12px 0; }
+  th { font-family:var(--font-mono); font-size:11px; letter-spacing:0.5px; text-transform:uppercase; color:var(--text-dim); text-align:left; padding:8px 12px; border-bottom:1px solid var(--border); }
+  td { padding:8px 12px; border-bottom:1px solid rgba(42,47,64,0.4); font-size:13px; }
+  td code { font-size:12px; }
+
+  .tip { background:rgba(59,130,246,0.06); border:1px solid rgba(59,130,246,0.2); border-radius:8px; padding:14px 18px; margin:12px 0; font-size:13px; }
+  .tip::before { content:'💡 '; }
+
+  .step-num { display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:50%; background:var(--purple); color:var(--bg); font-family:var(--font-mono); font-size:12px; font-weight:700; margin-right:8px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <a href="../index.html" class="back-link">← Back to Tools</a>
+
+  <div class="header">
+    <div class="badge">Guide</div>
+    <h1>🎨 Customization Guide</h1>
+    <p>How the upgrade system works — from player attributes to gameplay values.</p>
+  </div>
+
+  <!-- Data Flow -->
+  <div class="card">
+    <h2>Data Flow</h2>
+    <p>The Customization module bridges saved player data and the Tune script:</p>
+    <div class="flow-diagram">
+      <div class="flow-box">Player Attributes<br><small style="color:var(--text-dim)">Vehicle instance</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box highlight">LoadData()<br><small style="color:var(--text-dim)">Raw levels</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box highlight">GetResolved()<br><small style="color:var(--text-dim)">Lookup tables</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">Tune.Data<br><small style="color:var(--text-dim)">Final values</small></div>
+    </div>
+  </div>
+
+  <!-- Two Types of Values -->
+  <div class="card">
+    <h2>Two Types of Values</h2>
+    
+    <h3>Lookup Values (Level → Table → Value)</h3>
+    <p>The player stores an upgrade <strong>level</strong> (0, 1, 2, 3...). The Customization module converts it to an actual value using a lookup table.</p>
+    <table>
+      <thead><tr><th>Stat</th><th>Player Stores</th><th>Lookup Table</th><th>Tune.Data Key</th></tr></thead>
+      <tbody>
+        <tr><td>Horsepower</td><td>Level 0–6</td><td><code>HorsepowerTable</code></td><td><code>Tune.Data.Horsepower</code></td></tr>
+        <tr><td>Top Speed</td><td>Level 0–6</td><td><code>GearRatioTable</code></td><td><code>Tune.Data.GearRatio</code></td></tr>
+        <tr><td>Quick Shifter</td><td>Level 0–5</td><td><code>QuickShifterTable</code></td><td><code>Tune.Data.QuickShifter</code></td></tr>
+        <tr><td>Brake Power</td><td>Level 0–6</td><td><code>BrakePowerTable</code></td><td><code>Tune.Data.Brakepower</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3>Direct Values (Stored As-Is)</h3>
+    <p>These values are used directly — no lookup table, no conversion.</p>
+    <table>
+      <thead><tr><th>Stat</th><th>Default</th><th>Tune.Data Key</th><th>What it Does</th></tr></thead>
+      <tbody>
+        <tr><td>Brake Ratio</td><td>50</td><td><code>Tune.Data.BrakeRatio</code></td><td>Front/rear brake bias (0–100)</td></tr>
+        <tr><td>Dampening</td><td>50</td><td><code>Tune.Data.Dampening</code></td><td>Suspension damping strength</td></tr>
+        <tr><td>Tire Grip</td><td>2</td><td><code>Tune.Data.TireGrip</code></td><td>Tire friction coefficient</td></tr>
+        <tr><td>Lean Degree</td><td>68</td><td><code>Tune.Data.LeanDegree</code></td><td>Max lean angle (degrees)</td></tr>
+        <tr><td>Lean Speed</td><td>0.1</td><td><code>Tune.Data.LeanSpeed</code></td><td>Lean responsiveness (0.01–1)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Lookup Tables -->
+  <div class="card">
+    <h2>Lookup Tables</h2>
+    <p>Each table maps an integer level to a gameplay value. Level 0 is always the base (no upgrade).</p>
+    <div class="code-block">HorsepowerTable = {
+    [0] = 0,      -- Stock: no bonus HP
+    [1] = 10,     -- +10 HP
+    [2] = 15,     -- +15 HP
+    [3] = 20,     -- +20 HP
+    [4] = 25,     -- +25 HP
+    [5] = 30,     -- +30 HP
+    [6] = 50,     -- +50 HP (max)
+}</div>
+    <p>If a player somehow has a level higher than the table's max, it auto-clamps to the highest available level (no errors).</p>
+  </div>
+
+  <!-- Adding a New Stat -->
+  <div class="card">
+    <h2>Adding a New Upgrade Stat</h2>
+    <p>Example: adding "Acceleration" as a new upgradeable stat.</p>
+
+    <p><span class="step-num">1</span> <strong>Add a lookup table</strong> in <code>DataVehicle.Data</code>:</p>
+    <div class="code-block">AccelerationTable = {
+    [0] = 0,
+    [1] = 5,
+    [2] = 10,
+}</div>
+
+    <p><span class="step-num">2</span> <strong>Add a default level</strong> in <code>DefaultTableData</code>:</p>
+    <div class="code-block">Acceleration = 0,</div>
+
+    <p><span class="step-num">3</span> <strong>Add the Attribute</strong> on the player's Vehicle instance (via your shop/garage UI). It will be loaded automatically.</p>
+
+    <p><span class="step-num">4</span> <strong>Add to GetResolved()</strong>:</p>
+    <div class="code-block">Acceleration = safeLookup(self.Data.AccelerationTable, td.Acceleration),</div>
+
+    <p><span class="step-num">5</span> <strong>Use in the Tune script</strong>:</p>
+    <div class="code-block">Tune.RevAccel = 250 + Tune.Data.Acceleration</div>
+
+    <div class="tip">The attribute loop in LoadData() picks up new stats automatically from DefaultTableData. No extra loading code needed.</div>
+  </div>
+
+  <!-- MaxSpeed -->
+  <div class="card">
+    <h2>MaxSpeed</h2>
+    <p><code>MaxSpeed</code> is a single value (not a lookup table). It sets the global speed cap in km/h for all bikes.</p>
+    <div class="code-block">-- In DataVehicle.Data:
+MaxSpeed = 300,  -- km/h
+
+-- In GetResolved():
+MaxSpeed = self.Data.MaxSpeed,
+
+-- In Tune script:
+Tune.SpeedLimit = Tune.Data.MaxSpeed</div>
+    <p>To make MaxSpeed per-bike, convert it to a lookup table following the same steps as adding a new stat above.</p>
+  </div>
+
+  <!-- Studio Testing -->
+  <div class="card">
+    <h2>Testing in Studio</h2>
+    <p>When running in Roblox Studio, the module automatically loads maxed-out values so you can test at full power. Edit <code>studioOverrides</code> in <code>LoadData()</code> to test specific upgrade combinations:</p>
+    <div class="code-block">local studioOverrides = {
+    BrakePower   = 6,         -- Max brake level
+    Horsepower   = 6,         -- Max HP level
+    QuickShifter = 5,         -- Max quick shifter
+    TopSpeed     = 6,         -- Max gear ratio
+    TireGrip     = 2,         -- Standard grip
+    NumberPlate  = "Testing",
+}</div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -3,19 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EXRGarage — Motorcycle Tuning Tools</title>
+<title>EXRGarage — Tuning Tools</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏍️</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #0d0f13;
     --surface: #151820;
+    --surface2: #1c2030;
     --border: #2a2f40;
     --text: #e2e4ea;
     --text-dim: #6b7394;
     --accent: #3b82f6;
     --accent-glow: rgba(59, 130, 246, 0.15);
     --green: #34d399;
+    --orange: #f59e0b;
+    --red: #ef4444;
+    --purple: #a78bfa;
     --font-mono: 'JetBrains Mono', monospace;
     --font-sans: 'Space Grotesk', sans-serif;
   }
@@ -27,9 +31,6 @@
     color: var(--text);
     font-family: var(--font-sans);
     min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
 
   body::before {
@@ -46,10 +47,15 @@
   .container {
     position: relative;
     z-index: 1;
-    max-width: 640px;
-    width: 100%;
-    padding: 24px;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 24px;
+  }
+
+  /* Header */
+  .header {
     text-align: center;
+    margin-bottom: 48px;
   }
 
   .badge {
@@ -63,26 +69,47 @@
     border: 1px solid rgba(59, 130, 246, 0.25);
     padding: 6px 16px;
     border-radius: 20px;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
   }
 
-  h1 {
+  .header h1 {
     font-size: 36px;
     font-weight: 700;
     letter-spacing: -1px;
     margin-bottom: 12px;
   }
 
-  .subtitle {
+  .header p {
     color: var(--text-dim);
     font-size: 15px;
-    margin-bottom: 48px;
     line-height: 1.6;
   }
 
-  .tools-grid {
+  /* Section titles */
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+    margin-top: 40px;
+  }
+
+  .section-label:first-of-type { margin-top: 0; }
+
+  /* Tool/Guide cards */
+  .card-grid {
     display: grid;
     gap: 16px;
+  }
+
+  .card-grid.two-col {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (max-width: 640px) {
+    .card-grid.two-col { grid-template-columns: 1fr; }
   }
 
   .tool-card {
@@ -116,10 +143,10 @@
     flex-shrink: 0;
   }
 
-  .tool-icon.gear {
-    background: rgba(59, 130, 246, 0.1);
-    border: 1px solid rgba(59, 130, 246, 0.2);
-  }
+  .tool-icon.blue { background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); }
+  .tool-icon.green { background: rgba(52, 211, 153, 0.1); border: 1px solid rgba(52, 211, 153, 0.2); }
+  .tool-icon.orange { background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2); }
+  .tool-icon.purple { background: rgba(167, 139, 250, 0.1); border: 1px solid rgba(167, 139, 250, 0.2); }
 
   .tool-info h3 {
     font-size: 16px;
@@ -138,6 +165,7 @@
     color: var(--text-dim);
     font-size: 18px;
     transition: transform 0.2s;
+    flex-shrink: 0;
   }
 
   .tool-card:hover .tool-arrow {
@@ -146,7 +174,8 @@
   }
 
   .footer {
-    margin-top: 48px;
+    margin-top: 56px;
+    text-align: center;
     font-family: var(--font-mono);
     font-size: 12px;
     color: var(--text-dim);
@@ -163,19 +192,63 @@
 <body>
 
 <div class="container">
-  <div class="badge">EXRGarage</div>
-  <h1>Tuning Tools</h1>
-  <p class="subtitle">
-    Interactive tools for the EXRGarage motorcycle chassis.<br>
-    Tune, visualize, and generate configs for your Roblox bikes.
-  </p>
+  <div class="header">
+    <div class="badge">EXRGarage</div>
+    <h1>Tuning Tools & Guides</h1>
+    <p>
+      Interactive tools and reference guides for the EXRGarage motorcycle chassis.<br>
+      Tune, visualize, and configure your Roblox bikes.
+    </p>
+  </div>
 
-  <div class="tools-grid">
+  <!-- Tools -->
+  <div class="section-label">Tools</div>
+  <div class="card-grid">
     <a href="tools/gear-ratio-calculator.html" class="tool-card">
-      <div class="tool-icon gear">⚙️</div>
+      <div class="tool-icon blue">⚙️</div>
       <div class="tool-info">
         <h3>Gear Ratio Calculator</h3>
         <p>Generate smooth gear ratios with adjustable bias, preview spacing, and copy Lua output.</p>
+      </div>
+      <span class="tool-arrow">→</span>
+    </a>
+  </div>
+
+  <!-- Guides -->
+  <div class="section-label">Guides</div>
+  <div class="card-grid two-col">
+    <a href="guides/top-speed-reference.html" class="tool-card">
+      <div class="tool-icon green">🏁</div>
+      <div class="tool-info">
+        <h3>Top Speed Reference</h3>
+        <p>Real-world speed, power, and acceleration data for 250cc, 600cc, and 1000cc motorcycles.</p>
+      </div>
+      <span class="tool-arrow">→</span>
+    </a>
+
+    <a href="guides/tuning-guide.html" class="tool-card">
+      <div class="tool-icon orange">🔧</div>
+      <div class="tool-info">
+        <h3>Tuning Guide</h3>
+        <p>How to configure the Tune script — engine, gearing, suspension, brakes, and driving aids.</p>
+      </div>
+      <span class="tool-arrow">→</span>
+    </a>
+
+    <a href="guides/customization-guide.html" class="tool-card">
+      <div class="tool-icon purple">🎨</div>
+      <div class="tool-info">
+        <h3>Customization Guide</h3>
+        <p>How the upgrade system works — lookup tables, defaults, adding new stats, and data flow.</p>
+      </div>
+      <span class="tool-arrow">→</span>
+    </a>
+
+    <a href="guides/2t-vs-4t.html" class="tool-card">
+      <div class="tool-icon green">⚡</div>
+      <div class="tool-info">
+        <h3>2-Stroke vs 4-Stroke</h3>
+        <p>Speed, power, and weight differences between 2T and 4T engines across all displacements.</p>
       </div>
       <span class="tool-arrow">→</span>
     </a>

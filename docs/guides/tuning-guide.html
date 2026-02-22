@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EXRGarage — Tuning Guide</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏍️</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#0d0f13; --surface:#151820; --surface2:#1c2030; --border:#2a2f40; --text:#e2e4ea; --text-dim:#6b7394; --accent:#3b82f6; --accent-glow:rgba(59,130,246,0.15); --green:#34d399; --orange:#f59e0b; --red:#ef4444; --purple:#a78bfa; --font-mono:'JetBrains Mono',monospace; --font-sans:'Space Grotesk',sans-serif; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:var(--font-sans); min-height:100vh; line-height:1.7; }
+  body::before { content:''; position:fixed; inset:0; background-image:linear-gradient(rgba(59,130,246,0.03)1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,0.03)1px,transparent 1px); background-size:40px 40px; pointer-events:none; }
+  .container { position:relative; z-index:1; max-width:780px; margin:0 auto; padding:40px 24px; }
+  .back-link { display:inline-flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:12px; color:var(--text-dim); text-decoration:none; margin-bottom:24px; transition:color 0.2s; }
+  .back-link:hover { color:var(--accent); }
+  .header { text-align:center; margin-bottom:48px; }
+  .badge { display:inline-block; font-family:var(--font-mono); font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--orange); background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.25); padding:6px 16px; border-radius:20px; margin-bottom:16px; }
+  .header h1 { font-size:28px; font-weight:700; letter-spacing:-0.5px; margin-bottom:8px; }
+  .header p { color:var(--text-dim); font-size:14px; }
+
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:28px; margin-bottom:20px; }
+  .card h2 { font-size:18px; font-weight:700; margin-bottom:6px; }
+  .card h3 { font-size:15px; font-weight:600; margin-top:20px; margin-bottom:8px; color:var(--accent); }
+  .card p { color:var(--text-dim); font-size:14px; margin-bottom:12px; }
+  .card ul { padding-left:20px; margin-bottom:12px; }
+  .card li { color:var(--text-dim); font-size:14px; margin-bottom:6px; }
+  .card li strong { color:var(--text); }
+
+  code { font-family:var(--font-mono); font-size:13px; background:var(--surface2); padding:2px 8px; border-radius:4px; color:var(--green); }
+
+  .code-block { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:16px; font-family:var(--font-mono); font-size:13px; line-height:1.7; overflow-x:auto; white-space:pre; color:var(--text-dim); margin:12px 0; }
+
+  .tip { background:rgba(59,130,246,0.06); border:1px solid rgba(59,130,246,0.2); border-radius:8px; padding:14px 18px; margin:12px 0; font-size:13px; color:var(--text); }
+  .tip::before { content:'💡 '; }
+
+  .warn { background:rgba(245,158,11,0.06); border:1px solid rgba(245,158,11,0.2); border-radius:8px; padding:14px 18px; margin:12px 0; font-size:13px; color:var(--text); }
+  .warn::before { content:'⚠️ '; }
+
+  .toc { margin-bottom:32px; }
+  .toc a { display:block; color:var(--text-dim); font-size:14px; text-decoration:none; padding:6px 0; border-bottom:1px solid rgba(42,47,64,0.4); transition:color 0.2s; }
+  .toc a:hover { color:var(--accent); }
+  .toc a:last-child { border-bottom:none; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <a href="../index.html" class="back-link">← Back to Tools</a>
+
+  <div class="header">
+    <div class="badge">Guide</div>
+    <h1>🔧 Tuning Guide</h1>
+    <p>Everything you need to know about configuring the Tune script for your bike.</p>
+  </div>
+
+  <div class="card toc">
+    <h2>Contents</h2>
+    <a href="#overview">Overview — How the Tune Script Works</a>
+    <a href="#weight">Weight & Center of Gravity</a>
+    <a href="#tires">Tires & Grip</a>
+    <a href="#suspension">Suspension</a>
+    <a href="#steering">Steering & Leaning</a>
+    <a href="#brakes">Brakes</a>
+    <a href="#engine">Engine</a>
+    <a href="#transmission">Transmission & Gearing</a>
+    <a href="#aids">Driving Aids (ABS, TCS, Slipper)</a>
+    <a href="#limiter">Speed Limiter</a>
+  </div>
+
+  <div class="card" id="overview">
+    <h2>Overview</h2>
+    <p>The Tune script is the central config file for every bike. It controls physics, handling, engine behavior, gearing, and driving aids. At the top of the script, it loads the player's upgrade data from the Customization module:</p>
+    <div class="code-block">local Module = require(script.Customization)
+Module:LoadData()
+Tune.Data = Module:GetResolved()</div>
+    <p>After that, <code>Tune.Data.KeyName</code> gives you the player's resolved upgrade values. These are used throughout the script to make the bike faster, grippier, or better braking based on what the player has purchased.</p>
+  </div>
+
+  <div class="card" id="weight">
+    <h2>Weight & Center of Gravity</h2>
+    <p>Controls the bike's overall mass and how that mass is distributed. This affects acceleration, braking, stability, and how the bike behaves in corners.</p>
+    <h3>Key Values</h3>
+    <ul>
+      <li><strong>Weight</strong> — Total bike weight in LBS. Heavier = slower acceleration but more stable.</li>
+      <li><strong>WeightDistribution</strong> — Where the mass sits. 0 = all rear, 100 = all front, 55 = slightly front-biased (realistic for sport bikes).</li>
+      <li><strong>CGHeight</strong> — Center of gravity height in studs. Lower = more stable, less prone to wheelies and stoppies. Higher = more agile but tippier.</li>
+    </ul>
+    <div class="tip">For a sport bike, keep CGHeight between 0.4–0.8. For a cruiser, try 0.3–0.5.</div>
+  </div>
+
+  <div class="card" id="tires">
+    <h2>Tires & Grip</h2>
+    <p>Tire settings control how much grip the bike has. The player's <code>TireGrip</code> upgrade directly sets the friction coefficient.</p>
+    <h3>Key Values</h3>
+    <ul>
+      <li><strong>TireFriction</strong> — Set by <code>Tune.Data.TireGrip</code>. Higher = more grip. Default is 2.</li>
+      <li><strong>TireProfile</strong> — Shape of the tire. Lower = rounder (more contact at lean), higher = more angular.</li>
+      <li><strong>TireCompound</strong> — Number of compound layers. More layers = harder center (less grip but longer wear).</li>
+      <li><strong>TireCylinders</strong> — How many cylinders make up the tire shape. More = smoother but more lag. Default: 4, recommended max: 10.</li>
+    </ul>
+    <div class="tip">Visualize tire curves here: <a href="https://www.desmos.com/calculator/og4x1gyzng" style="color:var(--accent)">Desmos Tire Profiler</a></div>
+  </div>
+
+  <div class="card" id="suspension">
+    <h2>Suspension</h2>
+    <p>Controls ride height, spring stiffness, and damping. Front and rear are tuned separately.</p>
+    <h3>Key Values</h3>
+    <ul>
+      <li><strong>SusDamping</strong> — Set by <code>Tune.Data.Dampening</code>. Higher = firmer, less bouncy.</li>
+      <li><strong>SusStiffness</strong> — Spring rate. Higher = less body roll, stiffer ride.</li>
+      <li><strong>SusLength</strong> — Total travel in studs. Longer = more compliant over bumps.</li>
+      <li><strong>PreComp</strong> — Resting ride height. 0 = fully extended, 1 = fully compressed.</li>
+      <li><strong>ExtLimit / CompLimit</strong> — Max rebound and compression travel.</li>
+    </ul>
+    <div class="tip">Front stiffness should usually be slightly higher than rear (e.g., 600 front, 550 rear) for stability under braking.</div>
+  </div>
+
+  <div class="card" id="steering">
+    <h2>Steering & Leaning</h2>
+    <p>At low speed, the bike steers with handlebars. At high speed, leaning takes over.</p>
+    <h3>Handlebars</h3>
+    <ul>
+      <li><strong>SteerAngle</strong> — Max lock angle in degrees. 20° is typical for sport bikes.</li>
+      <li><strong>LowSpeedCut</strong> — Speed (SPS) where handlebar steering fades out. Rule: lower lock angle = higher cutoff.</li>
+    </ul>
+    <h3>Leaning</h3>
+    <ul>
+      <li><strong>LeanSpeed</strong> — Set by <code>Tune.Data.LeanSpeed</code>. How fast the bike tilts. 0.01 = slow, 1 = instant.</li>
+      <li><strong>MaxLean</strong> — Set by <code>Tune.Data.LeanDegree</code>. Maximum lean angle in degrees.</li>
+      <li><strong>LeanProgressiveness</strong> — How much steering is kept at speed. Lower = less turn, higher = more turn.</li>
+    </ul>
+    <div class="warn">If the bike feels twitchy at speed, lower LeanProgressiveness. If it won't turn, increase it.</div>
+  </div>
+
+  <div class="card" id="brakes">
+    <h2>Brakes</h2>
+    <p>All three brake types (front, rear, parking) use the same formula:</p>
+    <div class="code-block">BrakeForce = 250 + Tune.Data.Brakepower × 2</div>
+    <ul>
+      <li><strong>LinkedBrakes</strong> — When true, both brakes activate together.</li>
+      <li><strong>BrakesRatio</strong> — Set by <code>Tune.Data.BrakeRatio</code>. 0 = all rear, 50 = balanced, 100 = all front.</li>
+    </ul>
+    <div class="tip">Most sport bikes use 60–70% front brake bias. Set BrakeRatio to 60–70 for realistic feel.</div>
+  </div>
+
+  <div class="card" id="engine">
+    <h2>Engine</h2>
+    <p>The engine section controls RPM behavior, horsepower, torque, and forced induction. Visualize everything here: <a href="https://www.desmos.com/calculator/x1h2vdccu1" style="color:var(--accent)">Desmos Engine Curves</a></p>
+    <h3>Core Settings</h3>
+    <ul>
+      <li><strong>Horsepower</strong> — <code>BaseHP × 2 + Tune.Data.Horsepower</code>. The player's upgrade adds bonus HP.</li>
+      <li><strong>IdleRPM / Redline / PeakRPM</strong> — Define the RPM range. PeakRPM is where max power is made.</li>
+      <li><strong>PeakSharp</strong> — How narrow the powerband is. Higher = peakier, lower = flatter torque curve.</li>
+    </ul>
+    <h3>Forced Induction</h3>
+    <ul>
+      <li><strong>Turbochargers</strong> — Set count to 0 to disable. Adds power with turbo lag.</li>
+      <li><strong>Superchargers</strong> — Set count to 0 to disable. Adds power with no lag.</li>
+    </ul>
+  </div>
+
+  <div class="card" id="transmission">
+    <h2>Transmission & Gearing</h2>
+    <p>The gear ratios determine how engine power translates to wheel speed.</p>
+    <h3>Ratio Generator</h3>
+    <p>Instead of typing each gear manually, use <code>generateRatios()</code>:</p>
+    <div class="code-block">Tune.Ratios = generateRatios(
+    3,                            -- 1st gear (launch torque)
+    1.8 - Tune.Data.GearRatio,    -- Last gear (top speed)
+    6,                            -- Number of gears
+    0.7                           -- Bias (sporty)
+)</div>
+    <p>Use the <a href="../tools/gear-ratio-calculator.html" style="color:var(--accent)">Gear Ratio Calculator</a> to preview and tune.</p>
+    <h3>Clutch Types</h3>
+    <ul>
+      <li><strong>"Clutch"</strong> — Standard friction clutch. Best for manual bikes.</li>
+      <li><strong>"TorqueConverter"</strong> — Smoother engagement. Keeps RPMs up.</li>
+      <li><strong>"CVT"</strong> — Continuously variable. Use with single-gear ratio for scooters.</li>
+    </ul>
+    <h3>FinalDrive</h3>
+    <p>Formula: <code>(rear sprocket / front sprocket) × primary ratio</code>. This is a global multiplier on all gears — higher = more torque, lower = more speed.</p>
+  </div>
+
+  <div class="card" id="aids">
+    <h2>Driving Aids</h2>
+    <h3>ABS (Anti-lock Braking)</h3>
+    <p>Prevents wheel lockup under braking, reducing lowside crash risk. <code>ABSThreshold</code> sets how much slip is allowed before it kicks in.</p>
+    <h3>TCS (Traction Control)</h3>
+    <p>Prevents rear wheel spin under throttle, reducing highside crash risk. <code>TCSThreshold</code> is the slip trigger, <code>TCSLimit</code> is the minimum torque at full intervention.</p>
+    <h3>Slipper Clutch</h3>
+    <p>Automatically slips the clutch during hard engine braking to prevent rear wheel hop. Disabled in Manual mode.</p>
+  </div>
+
+  <div class="card" id="limiter">
+    <h2>Speed Limiter</h2>
+    <p>The speed limiter uses the bike's actual velocity converted to km/h. When enabled, it cuts engine power entirely at the set speed.</p>
+    <div class="code-block">Tune.Limiter    = true
+Tune.SpeedLimit = Tune.Data.MaxSpeed  -- km/h from Customization module</div>
+    <p>The conversion happens in the Engine function:</p>
+    <div class="code-block">local speedKMH = currentSpeed * (10 / 12) * 1.09728
+if speedKMH >= _Tune.SpeedLimit then
+    speedLimitMult = 0  -- cut power
+end</div>
+    <div class="warn">The limiter works in km/h, not SPS. Make sure your MaxSpeed in the Customization module is set in km/h.</div>
+  </div>
+
+</div>
+</body>
+</html>
